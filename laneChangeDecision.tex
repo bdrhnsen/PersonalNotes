@@ -1,0 +1,289 @@
+\documentclass{article}
+\usepackage{graphicx}
+\title{Lane change decision on highways, literature review}
+\date{2024-09}
+\author{Bedirhan Sen}
+\begin{document}
+  \pagenumbering{roman}
+  \maketitle
+  \newpage
+  
+  \section{Problem Description}
+  \begin{itemize}
+\item Mandatory lane change: Mandatory lane changes de-
+fine the situations where drivers must perform a lane
+change due to strict road rules and situations, such as
+lane endings or lane blockages
+\item Discretionary lane change: Discretionary lane
+changes are performed by drivers when the observa-
+tion indicates that, there is another lane with better
+driving conditions for the host vehicle. 
+\item Anticipatory Lane change: Finally, an-
+ticipatory lane changes are performed to improve road conditions for other road actors, such as allowing a faster vehicle to pass .
+\end{itemize}
+
+Aim to determine when and how to execute a lane change maneouver. Under efficiency, safety and comfort criteria. 
+
+3 categories of approaches to solve this problem
+\begin{itemize}
+\item Microscopic traffic models and decision trees
+\item Markov decision process
+\item Reinforcement learning. 
+\end{itemize} 
+
+task expected
+from a decision-making module is to increase safety
+and comfort while maintaining the desired speed.
+
+  \section{Approaches From Literuature}
+  
+  \subsection{Automated Lane Change Decision Making in Highway using a Hybrid
+Approach Caldıran et al}
+\subsubsection{literature review}
+Gipps(1986) introduced a decision-making model
+that covers various urban driving situations. . Driver’s behavior is governed by two
+basic considerations: maintaining the desired speed
+and being in the correct lane for an intended turn-
+ing maneuver.
+Ahmed (1999) proposed lane change
+decision-making models based on utility functions to
+model microscopic highway traffic scenarios. The probability of
+lane change was calculated based on the output of a
+softmax function and the decisions of the drivers to
+make lane changes were modeled using a decision
+tree. 
+Ardelt
+et al. (2012) integrated the ideas from Ahmed (1999)
+and Toledo (2003), and implemented a decision tree-
+based framework based on utilities of adjacent lanes,
+on an actual car. In the first phase, utilities of the
+lanes are computed with a decision tree mechanism.
+If the utilities indicate that a lane-change maneuver is
+profitable, the feasibility of this lane change is then
+controlled. If the lane change maneuver is not fea-
+sible, a lane change gap approach protocol, whose
+details were not provided, is activated.
+Nilsson et al. (2016) computed three
+types of utilities of adjacent lanes and assessed the
+quality of gaps for a lane change.
+A drawback of these utility-based methods is their
+limited capacity regarding the incorporation of the
+other traffic participants actions and their possible ef-
+fects on the decisions.
+n this regard, the Markov
+Decision Process (MDP) and Partially Observable
+Markov Decision Processes (PO-MDP) offer princi-
+pled solutions to modeling and decision-making pro-
+cesses. However, the implementation of MDPs or PO-
+MDPs poses practical problems due to their computa-
+tional complexity for real-time bound systems such as
+autonomous cars. 
+For example, Brechtel (2015) outlines highway
+driving scenarios as a generic Markov Decision Pro-
+cess with continuous states and action spaces based
+on the dynamics and inputs of a car.
+\subsubsection{Method}
+We discretize the time from past the future and calculate
+the utilities of lanes that belong to specific time inter-
+vals. We created a utility table to keep utility values
+from past to future, and we update the table at each
+time step with the incoming utilities.
+
+For future state prediction,
+we use linear future state estimator functions that cal-
+culate possible future velocities and positions of dy-
+namic objects. 
+
+Utility functions: 
+\begin{itemize}
+\item Longitudinal Velocity: The longitudinal velocity util-
+ity represents the difference between the desired ve-
+locity of ego and the actual velocity of ego 
+\item Average Time Gap: The average time gap of a lane
+represents the average of the time gaps between ve-
+hicles in the corresponding lane. For the calculation,
+the time gaps between longitudinally adjacent cars are
+calculated and the average of these time gaps are used
+as a utility factor.
+\item Average Longitudinal/Lateral Velocity: These factors
+denotes the average longitudinal and lateral velocities
+in a specific lane. Based on the desired velocity of
+ego, these factors can be used as hints to determine
+which lane to keep.
+\item Relative Leader Velocity: This factor denotes the
+highest relative velocities in each lane. Even though it
+is similar to the other velocity-related factors, know-
+ing the fastest objects in lanes may help the driver
+with the decision of keeping the current lane or not.
+\item Presence of Heavy Vehicles: Presence of heavy ve-
+hicles is an indicator of the inconvenient of a lane.
+Lanes with heavy vehicles tend to be flowing slower
+\item Required Number of Lane Changes: Required num-
+ber of lane changes to reach a lane is an impor-
+tant factor regarding driving safety and comfort. We
+should avoid targeting far lanes as much as possible
+and choose adjacent lanes to be sure about safety and
+comfort
+\item Presence of Tailgating: Tailgating is an undesirable
+situation that can easily cause accidents. If a behind
+vehicle is driving too closely, especially in the left-
+most lane, the ego vehicle should make a lane change
+to allow the vehicle to pass
+\item Left/Right Most Lane Check: In highway, keeping the
+left-most lane and right-most lane for a long time is
+generally inhibited. Thus, keeping these lanes for de-
+creases the utility of that lane over time.
+
+\end{itemize}
+For the overall utility calculation, we follow the
+formulation in Ardelt et al. (2012). For each discrete
+timestamp, we calculate the utilities of a lane from
+past to future and get an overall utility value. Even
+though past utilities are useful for a better assessment
+of a traffic situation, they can imply wrong predictions
+and slow down the utility process. 
+
+\textbf{At first they do not think about where are the gaps and is it okay to do a lane change
+they just asses the lane as a complete thing. Then there is a module to do a gap selection. }
+When a lane change decision is made, our gap se-
+lection algorithm searches for inter-vehicular gaps
+that comply with certain safety and comfort crite-
+ria. To find the best gap, the decision-making mod-
+ule requires the kinematic information of the vehicles
+around the ego vehicle for the whole 360◦ from the
+environment perception modules.
+The sensor fusion module, which is the core com-
+ponent of the environment perception modules, uses
+Kalman Filters to track the surrounding vehicles and
+hence assumes a normal distribution for the uncer-
+tainty in the estimated states of these vehicles.
+Our gap selection algorithm considers both the estimated
+kinematic states and their uncertainties for a feasi-
+ble lane change as in Ardelt et al. (2012), i.e., the
+rear/front bumper of a lead/follow vehicle is consid-
+ered to be 3 standard deviations away from its es-
+timated mean.
+
+Furthermore, we estimate the future positions of
+the surrounding vehicles using a constant acceleration
+model to predict the future states of the inter-vehicular
+gaps. Therefore, we can anticipate feasible but un-
+reachable gaps to be reachable in a certain time hori-
+zon and plan accordingly.
+Nevertheless, gaps that are expected to be reach-
+able in the future are not guaranteed to be reachable
+or feasible in the expected time horizon (see Fig. 2a
+and 2b). Therefore, gaps that are temporally closer to
+the current time frame are more desirable.
+
+Moreover,
+aligning with a feasible gap might require a deviation
+from the desired velocity, thus rendering the gap to
+be less desirable. These criteria lead to another multi-
+criteria selection problem among gaps. Similar to the
+lane utility functions, we defined the following crite-
+ria:
+• Uto : Time for the gap opening
+• Udur : Duration of the gap feasibility
+• Utr : Time to reach the gap
+• Uddv : Difference to desired velocity,
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{fig1.png}
+  \caption{approach from paper 1.}
+  \label{fig:Gui}
+\end{figure}
+
+
+  \subsection{Design of a utility-based lane change decision making algorithm and a
+motion planning for energy-efficient highway driving
+Sahar Zeinali}
+  
+  \subsubsection{literature review}
+\subsubsection{Method}
+The overall process of lane change can be divided into two steps,
+including decision making, and planning and control. In the first step,
+the desirability of the maneuver is checked via a decision making
+algorithm. In the case of a desirable maneuver, its feasibility is checked
+by an MPC-based trajectory planning. If the maneuver is feasible, a
+lateral controller finds appropriate control inputs to execute the lane
+change.
+\begin{figure}
+  \includegraphics[width=\linewidth]{fig2.png}
+  \caption{approach from paper 2.}
+  \label{fig:Gui}
+\end{figure}
+The desirability of a lane change maneuver is checked via a decision
+making algorithm, which is based on a utility function. This function
+considers different aspects of the maneuver Li et al. (2020) and Nilsson
+et al. (2016), such as:
+1. Average travel time in lane ,
+2. Remaining travel time in lane ,
+3. Energy consumption in lane ,
+4. Traffic rules.
+
+\begin{itemize}
+\item Average travel time Ulv
+This variable shows the deviation of the average travel time of the
+lane from the average travel time as expected from the desired velocity
+vdes, set by the driver. It is defined as
+
+where vdes and vl are the desired longitudinal velocity for the EV and
+the average longitudinal velocity of the lanes l = c or l = t, respectively.
+Also, gama > 0 is a parameter to avoid division by zero and dmax is the
+maximum travel distance, defined as
+dmax = Bvdes, (2)
+where B is a positive constant. 
+The average velocity of a lane is
+calculated by taking an average of the velocities of the leading and
+trailing vehicles in the lane.
+
+\item 
+Remaining travel time Uld
+This parameter shows the time duration that the EV can stay in the
+current lane l and is defined as
+Uld = min(dmax, dend)/vdes 
+where dend is the distance to the end point of the lane l
+\item Energy consumption Ule
+This variable shows the desirability of the lane change maneuver
+from an energy efficiency point of view. In other words, by incorporat-
+ing this variable, the lane with an average velocity closer to the optimal
+operating point of the energy map is selected.
+\item Traffic rules Ulr
+In order to incorporate the rule of driving in the rightmost lane as
+much as possible, the following utility function is considered: Ulr = -L
+where L is the number of lanes to the right-hand side of the lane l.
+
+A lane change maneuver is desirable if the utility function of the
+target lane is higher than that of the current lane. In other words, if
+Ut > (1 + e)Uc , where Uc and Ut are the total utility functions of the
+current and target lane, respectively, and e is a positive parameter.
+If a lane change is desirable, then in the next step, MPC as the
+longitudinal planner, tries to find an appropriate engine or brake torque
+to position the EV in the gap between the leading and trailing vehicles
+in the target lane. For this purpose, the longitudinal dynamical model is
+discussed in the next section, and then the energy-efficient MPC design
+is presented in Section 4
+
+\textbf{The motion of the TVs during the prediction horizon is predicted
+by a constant velocity assumption.}
+
+\end{itemize}
+Lateral Trajectory planner: Utilizing a sigmoid function is another way to
+design the trajectory. This function has beneficial mathematical charac-
+teristics, such as continuity, differentiability, and a simple closed-form
+expression. Furthermore, this function allows us to consider the dy-
+namic and geometric constraints of the system, which is the most
+important advantage
+  \subsection{Paper3}
+    \subsubsection{literature review}
+\subsubsection{Method}
+  \subsection{Paper4}
+    \subsubsection{literature review}
+\subsubsection{Method}
+  \subsection{Paper5}
+    \subsubsection{literature review}
+\subsubsection{Method}
+  
+  
+  \end{document}
