@@ -188,11 +188,11 @@ ria:
 • Utr : Time to reach the gap
 • Uddv : Difference to desired velocity,
 
-\begin{figure}
-  \includegraphics[width=\linewidth]{fig1.png}
-  \caption{approach from paper 1.}
-  \label{fig:Gui}
-\end{figure}
+%\begin{figure}
+ % \includegraphics[width=\linewidth]{fig1.png}
+  %\caption{approach from paper 1.}
+  %\label{fig:Gui}
+%\end{figure}
 
 
   \subsection{Design of a utility-based lane change decision making algorithm and a
@@ -208,11 +208,12 @@ algorithm. In the case of a desirable maneuver, its feasibility is checked
 by an MPC-based trajectory planning. If the maneuver is feasible, a
 lateral controller finds appropriate control inputs to execute the lane
 change.
-\begin{figure}
-  \includegraphics[width=\linewidth]{fig2.png}
-  \caption{approach from paper 2.}
-  \label{fig:Gui}
-\end{figure}
+%\begin{figure}
+ % \includegraphics[width=\linewidth]{fig2.png}
+ % \caption{approach from paper 2.}
+ % \label{fig:Gui}
+%\end{figure}
+%
 The desirability of a lane change maneuver is checked via a decision
 making algorithm, which is based on a utility function. This function
 considers different aspects of the maneuver Li et al. (2020) and Nilsson
@@ -275,15 +276,116 @@ teristics, such as continuity, differentiability, and a simple closed-form
 expression. Furthermore, this function allows us to consider the dy-
 namic and geometric constraints of the system, which is the most
 important advantage
-  \subsection{Paper3}
+  \subsection{Lane Change Decision-making through Deep
+Reinforcement Learning with Rule-based
+Constraints Wang et al}
+  	
+  	\subsection{DQN deep q network}
+  	
     \subsubsection{literature review}
+    Wolf et al. [16] presented a method
+for teaching an agent to drive a car in a simulation environment
+by using DQN. The input of the network was the front-facing
+camera image with a shape of 48×27, and the action space, i.e.
+the network output, was discrete—5 actions were defined and
+each corresponding to a different steering angle. The reward
+function depended on the distance from the lane center and
+some relative items (such as the error of the angle between the
+vehicle and the center line). Hoel et al. [17] also used DQN
+to deal with the problem of vehicle speed and lane change
+decision-making in a simulation environment. Different from
+previous work mentioned above, the Q-network input in [17]
+was defined as a one-dimensional vector of the relative po-
+sition, speed, and lane of surrounding vehicles, rather than
+front-facing images. Two different agents were defined with
+the discrete action space. The first agent considered only the
+lateral lane change control, while the second considered both
+the lane change and speed control. The result showed that the
+second agent outperforms the former when CNNs were both
+utilized. However, how to guarantee the decisions’ safety of
+the learning-based method should be further considered.
+
 \subsubsection{Method}
-  \subsection{Paper4}
+The
+task of the decision-making module is to make an appropriate
+driving decision according to the sensor information from the
+perception module, and then plan a drivable path to the control
+module
+\textbf{Nevertheless, how to make a reliable decision is still a problem
+for the rule-based methods owing to their poor ability to
+generalize to unknown situations [11]}
+
+\begin{figure}
+ \includegraphics[width=\linewidth]{fig3.png}
+ \caption{approach from paper 3.}
+ \label{fig:Gui}
+\end{figure}
+
+
+
+  \subsection{Rule-Based Safety-Critical Control Design using Control Barrier
+Functions with Application to Autonomous Lane Change}
     \subsubsection{literature review}
+    ccording to
+statistics provided by US National Highway Traffic Safety
+Administration (NHTSA) in [1], about 9 percent of all vehicle
+crashes involved lane change maneuvers. B. Sen, J. D. Smith, W. G. Najm et al., “Analysis of lane change
+crashes,” United States. National Highway Traffic Safety Administra-
+tion, Tech. Rep., 2003
 \subsubsection{Method}
-  \subsection{Paper5}
+  \subsection{Integrated driving behavior modeling Toledo}
     \subsubsection{literature review}
 \subsubsection{Method}
   
+  \subsection{implementation from github}
+  https://medium.com/@madhusudhan.d/path-planning-for-self-driving-cars-in-a-virtual-highway-fb266ba6713b
+  The goal of the project to make a ego car drive around a virtual highway in dense traffic by adhering to following constraints for minimum 4.32 Miles.
+
+    No collision at any time with other vehicles
+    Maximum speed of 50 MPH (~ 80 KMH)
+    Maximum acceleration of 10 m/s²
+    Maximum jerk of 10 m/s³
+    Vehicle cannot be in between lanes for more than 3 seconds
+    Vehicle cannot go outside the 3 lanes of the highway
+    Vehicle cannot drive on the wrong side of the highway
+    
+    planning code should output the trajectory of planned path to the term 3 simulator provided by Udacity, which will then visualize the ego behavior and output dynamic parameter like velocity, acceleration, jerk etc.
   
+  \textbf{the simulator takes in position data in Cartesian coordinate system. However it can output position in Cartesian and Frenet Coordinate system. }
+  
+  \textbf{This module is heavily simplified in this project by using a Linear point model or constant velocity model for all the vehicles around the ego car. Given the duration for which the prediction is required, the new position of all the vehicles are calculated. }
+  
+  The basis of trajectory planning in this project is the map of highway given as text file highway map.csv. It is a cloud of points with each point described as both in cartesian and Frenet coordinate system. Format is as follows [X,Y,s,dx,dy].
+  
+  I think for path generation part  part of this map is isolated using the last 2 points in previous path and three more points selected over 90 m range. These five points are transformed from map coordinate system to vehicle coordinate system and interpolated using open source Spline function. For spline function they used https://kluge.in-chemnitz.de/opensource/spline/ The end result will be a spline starting from last position in previous path extending over 90 m along the track.
+  
+  They use a simulator which executes every point input in 20ms so the spacing between 2 points determines the vehicle speed. Then these points are transformed back the xy coordinate system. 
+  
+  They use 2 step system similar in the papers I looked for. 
+  First lanes are ranked by cost functions and you choose the ideal lane to be in. 
+  Then as a second step you choose the vacant area in that lane and make the change. 
+  
+  They used a fsm approach with 5 states,
+      Keep Lane: 
+    Prepare for Lane Change Left :
+    Prepare for Lane Change Right: 
+    Lane Change Left 
+    Lane Change Right 
+    
+    Costs:
+    \begin{itemize}
+    \item goal\_lane\_cost : This function imposes higher cost on trajectories with vehicle in first or third lane and zero cost if the vehicle is in middle lane. Being in middle is efficient
+    \item inefficiency\_cost : This function imposes higher cost on trajectories with intended and final lane that have traffic slower than the vehicle’s target speed. The function promotes lane change to maintain vehicle speed.
+    \item lane\_change\_safety\_cost : This function imposes higher cost on trajectories that attempt lane change when speed difference between current lane and goal lane is less than 7 Kmph. This limits potential for accidents during lane change in heavy traffic
+    lane\_chane\_safe\_dist\_cost : This function imposes higher cost on trajectories that attempt a lane change when front cars in both goal lane and current lane travel at same speed and distance ahead of ego car .This prevents waggling of ego cars
+    \end{itemize}
+    
+  \subsection{Code decryption}
+  generate predictions() of the class::Vehicle for the surrounding vehicle's state estimation with \textbf{constant velocity assumption} 
+  
+  The getXY helper function calculates the X and Y value given s and d in frenet coordinate system
+  
+  Behavior planning implementation is available in Vehicle.cpp . The function successor states() creates all these states. All the above states are coded in the functions keep lane trajectory(), prep lane change trajectory(), lane change trajectory(). These functions after checking for their respective conditions will call the function get kinematics() to calculate new position, velocity and acceleration. All these trajectories are then evaluated in test func() and trajectory with minimal cost is returned.
+  
+  All the cost functions are implemented in Cost.cpp. The function calculate\_cost() calculates weighted mean of the individual cost values.
   \end{document}
