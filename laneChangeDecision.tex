@@ -322,6 +322,49 @@ generalize to unknown situations [11]}
 \end{figure}
 
 
+\subsection{A Reinforcement Learning Based Approach for Automated Lane
+Change Maneuvers *******}
+\subsection{literature review}
+C. Vallon, Z. Ercan, A. Carvalho, F. Borrelli. A machine learning
+approach for personalized autonomous lane change initiation and
+control. IEEE Intelligent Vehicles Symposium (IV), Los Angeles,
+2017.proposed to use Support
+Vector Machine to make the lane change decision
+tailored to the driver’s individual driving preferences.
+After the lane change demand is generated, the maneuver
+is executed using a MPC.
+
+***Reinforcement learning, one promising category in
+the machine learning family, has the capability of dealing
+with time-sequential problems and seeking optimal
+policies for long-term objectives by learning from trials
+and errors, without resorting to an off-line collected
+database.***
+
+***
+In our case, the driving environment involves the
+interaction with other vehicles whose behaviors may be
+cooperative or adversarial. For example, when a vehicle
+reveals its intention of a lane change by turning on the
+turning signal, the lag vehicle on the target lane may
+cooperatively decelerate or change its path to yield, or it
+may adversarially accelerate just to deter the vehicle from
+cutting into its course of motion. Consequently, it is not
+trivial to model the environment explicitly with all
+possible future situations. Thus, we resort to a model-free
+approach to find the optimal policy.*** YOU CAN NOT MODEL EVERY CASE. IF you dont do reinforcement learning
+
+\subsubsection{Method}
+** They train with yaw accelaration. This means for every state of the environment they find an ideal yaw accelaration**
+
+chosen state as tate space includes the ego vehicle’s speed
+v, longitudinal acceleration a, position X, y , yaw angle
+theta, target lane id, lane width w, and road curvature c.
+s = v, a, X, y, theta, id, w, c =  S
+
+\subsection{P. Wang, C. Chan, Formulation of Deep Reinforcement Learning
+Architecture Toward Autonomous Driving for On-Ramp Merge.
+IEEE 20th International Conference on ITS, JAPAN, 2017}
 
   \subsection{Rule-Based Safety-Critical Control Design using Control Barrier
 Functions with Application to Autonomous Lane Change}
